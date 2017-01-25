@@ -57,7 +57,7 @@ function findChildren(foundPeople, people) {
     return id == person.parents[0] || id == person.parents[1];
   }));
   for (i in foundDescendants) {
-    foundDescendants.concat(findChildren([foundDescendants[i]], people));
+    foundDescendants = foundDescendants.concat(findChildren([foundDescendants[i]], people));
   }
   return foundDescendants;
 }
