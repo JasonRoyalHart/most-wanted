@@ -9,7 +9,7 @@ function initSearch(people, choice){
   }
   else if (choice == "descendants" || "descendant") {
     var name = prompt("Please enter a name to search descendants of.");
-    findFamily(people, name);
+    findDescendants(people, name);
   }
   else {
     nameFeatures = prompt("Please enter name or feature.");
@@ -17,9 +17,8 @@ function initSearch(people, choice){
   }
 }
 
-
-function initSearchByName(people, name){
-  splitNames = name.split(" ");
+function findNames(people, name) {
+  var splitNames = name.split(" ");
   if (splitNames.length != 2) {
     name = prompt("Please enter a first and last name.")
     initSearchByName(people, name);
@@ -27,6 +26,11 @@ function initSearchByName(people, name){
   foundPeople = (people.filter(function(person){
     return splitNames[0] == person.firstName && splitNames[1] == person.lastName;
   }));
+  return foundPeople;
+}
+
+function initSearchByName(people, name){
+  var foundPeople = findNames(people, name);
   var alertString = "";
     if (foundPeople.length > 0) {
       for (var key in foundPeople[0]) {
@@ -45,26 +49,32 @@ function initSearchByName(people, name){
 function initSearchByTraits(people, features){
     var featuresArray = features.replace(/\s/g,'').split(",");
 }
-function findFamily(people, name){
-  splitNames = name.split(" ");
-  if (splitNames.length != 2) {
-    name = prompt("Please enter a first and last name.")
-    initSearchByName(people, name);
-  }
-  foundPeople = (people.filter(function(person){
-    return splitNames[0] == person.firstName && splitNames[1] == person.lastName;
+
+function findChildren(foundPeople, people) {
+  var foundDescendants = [];
+  var id = foundPeople[0]["id"];
+  foundDescendants = (people.filter(function(person){
+    return id == person.parents[0] || id == person.parents[1];
   }));
+  for (i in foundDescendants) {
+    foundDescendants.concat(findChildren([foundDescendants[i]], people));
+  }
+  return foundDescendants;
+}
+
+function findDescendants(people, name){
+  foundPeople = findNames(people, name);
   var alertString = "";
     if (foundPeople.length > 0) {
-        var id = foundPeople[0]["id"];
-        foundDescendants = (people.filter(function(person){
-          return id == person.parents[0] || id == person.parents[1];
-        }))
+        foundDescendants = findChildren(foundPeople, people);
       }
       else {
         alert("Name not found.")
       }
-      alert(foundDescendants);
+      for (i in foundDescendants) {
+        alertString += foundDescendants[i]["firstName"] + " " + foundDescendants[i]["lastName"] + "\n";
+      }
+      alert(alertString);
 
 }
 function displayResults(){
