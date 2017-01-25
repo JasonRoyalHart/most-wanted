@@ -5,10 +5,17 @@
     <title>devCodeCamp &middot; Most Wanted</title>
   </head>
   <body>
-    <input type="text" class="form-control" id="nameSearch" name="nameSearch">
+<!--    <input type="text" class="form-control" id="firstName" name="firstName">
+    <input type="text" class="form-control" id="lastName" name="lastName">
     <button onclick="initSearch(data)">Start Searching</button>
+  -->
     <script src="data.js"></script>
     <script src="gui.js"></script>
     <script src="app.js"></script>
+    <script>
+    var choice = prompt("Would you like to search for name, features, descendants, family, or next of kin?");
+    initSearch(data, choice.toLowerCase());
+    </script>
+
   </body>
 </html>
