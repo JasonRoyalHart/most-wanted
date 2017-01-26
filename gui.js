@@ -57,11 +57,14 @@ function initSearchByTraits(people, features){
 function findChildren(foundPeople, people) {
   var foundDescendants = [];
   var id = foundPeople[0]["id"];
+  var children = [];
   foundDescendants = (people.filter(function(person){
     return id == person.parents[0] || id == person.parents[1];
   }));
-  document.write(foundDescendants[0]);
-  return foundDescendants;
+  for (i in foundDescendants) {
+    children.push(foundDescendants[i]["firstName"] + " " + foundDescendants[i]["lastName"]);
+  }
+  return children;
 }
 
 function findAllChildren(foundPeople, people) {
@@ -100,7 +103,6 @@ function findSiblings(foundPerson, people) {
     foundParents = (people.filter(function(person){
       return person["parents"][0] == foundPerson["parents"][i] || person["parents"][1] == foundPerson["parents"][i];
     }));
-    document.write(foundParents[0]["firstName"]);
     for (i in foundParents) {
       if (id != foundParents[i]["id"]) {
         siblings.push(foundParents[i]["firstName"] + " " + foundParents[i]["lastName"]);
@@ -122,7 +124,8 @@ function findFamily(people, name) {
   var foundPeople = findNames(people, name);
   var person = foundPeople[0];
   var family = [];
-  family = family.concat(findChildren[foundPeople, people]);
+  children = findChildren(foundPeople, people);
+  family = family.concat(children);
   if (person["currentSpouse"] != null) {
     family.push(findNameFromId(people, person["currentSpouse"]));
   }
@@ -132,10 +135,8 @@ function findFamily(people, name) {
 
   family = family.concat(findSiblings(person, people));
   var alertString = "";
-  //document.write(family);
   if (family.length > 0) {
     for (i in family) {
-  //    document.write(family[i]);
       alertString += family[i] + "\n";
     }
   }
