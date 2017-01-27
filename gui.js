@@ -15,6 +15,10 @@ function initSearch(people, choice){
     var name = prompt("Please enter a name to find that person's family.");
     findFamily(people, name);
   }
+  else if (choice == "next" || choice == "next of kin" || choice == "kin") {
+    var name = prompt("Please enter a name to find that person's next of kin.");
+    findNextOfKin(people, name);
+  }
   else {
     nameFeatures = prompt("Please enter name or feature.");
     findFeatures(people, nameFeatures);
@@ -25,7 +29,7 @@ function findNames(people, name) {
   var splitNames = name.split(" ");
   if (splitNames.length != 2) {
     name = prompt("Please enter a first and last name.")
-    initSearchByName(people, name);
+    findNames(people, name);
   }
   foundPeople = (people.filter(function(person){
     return splitNames[0] == person.firstName && splitNames[1] == person.lastName;
@@ -41,9 +45,9 @@ function initSearchByName(people, name){
         if (foundPeople[0].hasOwnProperty(key)) {
             alertString += key + ": ";
             alertString += foundPeople[0][key] + "\n";
-            alert(alertString);
           }
         }
+      alert(alertString);
       }
       else {
         alert("Name not found.")
@@ -143,6 +147,34 @@ function findFamily(people, name) {
   alert(alertString);
 
 }
+function findOldestSpouse(people, person) {
+  return findNameFromId(people, person["currentSpouse"]);
+}
+
+function findOldestChild(people, children) {
+  var eldest = children[0];
+  for (i in children) {
+    if (getAge(people, children[i]) > getAge(people, eldest)) {
+      eldest = children[i];
+    }
+  }
+  return eldest;
+}
+
+
+function findNextOfKin(people, name) {
+  var foundPeople = findNames(people, name);
+  var person = foundPeople[0];
+  var alertString = "";
+  if (person["currentSpouse"] != null) {
+    alertString = findOldestSpouse(people, person);
+  }
+  else if (findChildren(foundPeople, people) != []) {
+    alertString = findOldestChild(people, findChildren(foundPeople, people));
+
+  }
+  alert(alertString);
+}
 function findFeatures(people, nameFeatures) {
 
 }
@@ -152,8 +184,34 @@ function displayResults(){
 function isNumeric() {
 	;
 }
-function getAge(){
-	;
+function findDobFromName(people, name) {
+  var names = name.split(" ");
+  entry = (people.filter(function(person){
+    return person["firstName"] == names[0] && person["lastName"] == names[1];
+  }));
+  return entry[0]["dob"];
+}
+function getAge(people, person){
+    var dob = findDobFromName(people, person);
+    var todaysDate = new Date();
+    for (i = 0; i < dob.length; i++) {
+      if (dob[i] == "/") {
+        break;
+      }
+    }
+    var month = dob.substr(0,i);
+    for (j = i+1; j < dob.length; j++) {
+      if (dob[j] == "/") {
+        break;
+      }
+    }
+    var day = dob.substr(i+1,j-2);
+    var year = dob.substr(dob.length-4, dob.length);
+    document.write(dob + "<br><br>");
+    document.write(day + "<br><br>");
+
+
+    return 25;
 }
 function getHeight(){
 	;
