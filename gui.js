@@ -71,6 +71,18 @@ function findChildren(foundPeople, people) {
   return children;
 }
 
+function findGrandchilden(person, people) {
+  var grandchildren = [];
+  var children = findChildren(person);
+  for (i in children) {
+    childrenChildren = findchildren(children[i]);
+    for (j in childrenChildren) {
+      grandchildren.push(childrenChildren[j])
+    }
+  }
+  return grandchildren;
+}
+
 function findAllChildren(foundPeople, people) {
   var foundDescendants = [];
   var id = foundPeople[0]["id"];
@@ -114,6 +126,13 @@ function findSiblings(foundPerson, people) {
     }
   }
   return siblings;
+}
+
+function findPersonFromID(people, id) {
+  var foundPerson = (people.filter(function(person){
+    return id == person["id"];
+  }));
+  return foundPerson[0];
 }
 
 function findNameFromId(people, id) {
@@ -161,6 +180,37 @@ function findOldestChild(people, children) {
   return eldest;
 }
 
+function findOldestParent(people, parents) {
+  var eldest = parents[0];
+  for (i in parents) {
+    if (age(findPersonFromID(parents[i])) > age(findPersonFromID(eldest))) {
+      eldest = parents[i];
+    }
+  }
+  return findNameFromId(eldest);
+}
+
+function findOldestSibling(people, person) {
+  var siblings = findSiblings(person, people);
+  var eldest = siblings[0];
+  for (i in siblings) {
+    if (age(siblings[i]) > age(eldest)) {
+      eldest = siblings[i];
+    }
+  }
+  return eldest;
+}
+
+function findOldestGrandchild(people, person) {
+  var grandchildren = findGrandchilden(person);
+  var eldest = grandchildren[0];
+  for (i in grandchildren) {
+    if (age(grandchildren[i]) > age(eldest)) {
+      eldest = grandchildren[i];
+    }
+  }
+  return eldest;
+}
 
 function findNextOfKin(people, name) {
   var foundPeople = findNames(people, name);
@@ -171,8 +221,19 @@ function findNextOfKin(people, name) {
   }
   else if (findChildren(foundPeople, people) != []) {
     alertString = findOldestChild(people, findChildren(foundPeople, people));
+  }
+  else if (person["parents"] != []) {
+    alertString = findOldestParent(people, person["parents"]);
+  }
+  else if (findSiblings(person, people) != []) {
+    alertString = findOldestSibling(people, person);
+  }
+  else if (findGrandchilden(person, people) != []) {
+    alertString = findOldestGrandchild(people, person);
+  }
 
   }
+
   alert(alertString);
 }
 function findFeatures(people, nameFeatures) {
@@ -191,6 +252,7 @@ function findDobFromName(people, name) {
   }));
   return entry[0]["dob"];
 }
+
 function getAge(people, person){
     var dob = findDobFromName(people, person);
     var todaysDate = new Date();
@@ -199,6 +261,7 @@ function getAge(people, person){
         break;
       }
     }
+//    document.write("i: " + i + "<br>");
     var month = dob.substr(0,i);
     for (j = i+1; j < dob.length; j++) {
       if (dob[j] == "/") {
@@ -206,12 +269,19 @@ function getAge(people, person){
       }
     }
     var day = dob.substr(i+1,j-2);
+    if (day[1] == "/" || day[2] == "/") {
+      day = dob.substr(i+1,j-3);
+    }
     var year = dob.substr(dob.length-4, dob.length);
-    document.write(dob + "<br><br>");
-    document.write(day + "<br><br>");
 
-
-    return 25;
+    var todaysMonth = todaysDate.getMonth()+1;
+    var todaysDay = todaysDate.getDate();
+    var todaysYear = todaysDate.getFullYear();
+    var age = Number(todaysYear) - Number(year);
+    if (Number(todaysMonth) <= Number(month) && Number(todaysDay) <= Number(day)) {
+      age++;
+    }
+    return age;
 }
 function getHeight(){
 	;
