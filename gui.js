@@ -19,9 +19,9 @@ function initSearch(people, choice){
     var name = prompt("Please enter a name to find that person's next of kin.");
     findNextOfKin(people, name);
   }
-  else {
-    nameFeatures = prompt("Please enter name or feature.");
-    findFeatures(people, nameFeatures);
+  else if (choice == "feature" || choice == "features") {
+    features = prompt("Please type your search terms, separated by commas.");
+    initSearchByTraits(people, features);
   }
 }
 
@@ -54,8 +54,166 @@ function initSearchByName(people, name){
       }
 }
 
+function findHeight(feature) {
+  if (feature.includes("'") && feature.includes("\"")) {
+    for (i = 0; i < feature.length; i++) {
+      if (feature[i] == "'") {
+        var singleQuote = i;
+        break;
+      }
+    }
+    for (j = 0; j < feature.length; j++) {
+      if (feature[j] == "\"") {
+        var doubleQuote = j;
+        break;
+      }
+    }
+    if (singleQuote > doubleQuote) {
+      return [false, 0];
+    }
+      //find first Number
+    if (Number(feature.slice(0, singleQuote-1)) != NaN) {
+      var feet = Number(feature.slice(0, singleQuote-1));
+    }
+    else {
+      return [false, 0];
+    }
+    if (Number(feature.slice(singleQuote+1, feature.slice(doubleQuote-1))) != NaN) {
+      var inches = Number(feature.slice(singleQuote+1, feature.slice(doubleQuote-1)));
+    }
+    else {
+      return [false, 0];
+    }
+    return [true, (feet*12)+inches];
+  }
+  else {
+    return false;
+  }
+}
+
+function findAgeRange(feature) {
+  if (!feature.includes("-")) {
+    return [false, 0, 0];
+  }
+  for (i = 0; i < feature.length; i ++) {
+    if (feature[i] == "-") {
+      dash = i;
+      break;
+    }
+  }
+  if (feature.slice(0, dash-1) == NaN) {
+    return [false, 0, 0];
+  }
+  else {
+    var lowAge = feature.slice(0, dash-1);
+  }
+  if (feature.slice(dash+1, feature.length) == NaN) {
+    return [false, 0, 0];
+  }
+  else {
+    var highAge = feature.slice(dash+1, feature.length);
+  }
+  return [true, lowAge, highAge];
+}
+
+function findWord(feature) {
+  feature = feature.toLowerCase;
+  letters = "q,w,e,r,t,y,u,i,o,p,a,s,d,f,g,h,j,k,l,z,x,c,v,b,n,m".split(",");
+  for (i = 0; i < feature.length; i++) {
+    var found = false;
+    for (j = 0; j < letters.length; j++) {
+      if (feature[i] == letters[j]) {
+        found = true;
+      }
+    }
+    if (found == false) {
+      return [false, ""];
+    }
+  }
+  return [true, feature];
+}
+
+function findTraitFound(searchTypes) {
+  for (i in searchTypes) {
+    if (searchTypes[i][0] == "NotFound") {
+      return false;
+    }
+  }
+  return true;
+}
+
+function filterResults(people, searchTypes) {
+  for (i in searchTypes) {
+    searchType = searchTypes[i];
+    type = searchType[0];
+    if (type == "Age") {
+      foundPeople = (people.filter(function(person){
+        return searchType[1] == person.age;
+      }));
+    }
+    else if (type == "Weight") {
+      foundPeople = (people.filter(function(person){
+        return searchType[1] == person.weight;
+      }));
+    }
+    else if (type == "Height") {
+      foundPeople = (people.filter(function(person){
+        return searchType[1] == person.height;
+      }));
+    }
+    else if (type == "Word") {
+      foundPeople = (people.filter(function(person){
+        return searchType[1] == person.eyeColor || searchType[1] == person.occupation;
+      }));
+    }
+    else if (type == "AgeRange") {
+      foundPeople = (people.filter(function(person){
+        return searchType[1] >= person.age && searchType[2] <= person.age;
+      }));
+    }
+    return foundPeople;
+  }
+}
+
 function initSearchByTraits(people, features){
     var featuresArray = features.replace(/\s/g,'').split(",");
+    var searchTypes = [];
+    document.write(featuresArray);
+    for (i in featuresArray) {
+      feature = featuresArray[i];
+      if (Number(feature != NaN) && feature>-1 && feature<10000) {
+        document.write("Found a 1 to 4 digit number. (Age)<br><br>");
+        searchTypes[i] = ["Age", feature];
+      }
+      else if (feature.slice(feature.length-2, feature.length) == "lbs" && Number(feature.slice(0, feature.length-3)) != NaN) {
+        document.write("Found lbs (weight).<br><br>");
+        searchTypes[i] = ["Weight",feature.slice(0, feature.length-3)];
+      }
+      else if (findHeight(feature)[0]) {
+        document.write("Found height.<br><br>");
+        searchTypes[i] = ["Height", findHeight(feature)[1]];
+      }
+      else if (findAgeRange(feature)[0]) {
+        document.write("Found Age Range.<br><br>");
+        searchTypes[i] = ["AgeRange", findAgeRange(feature)[1], findAgeRange(feature)[2]];
+      }
+      else if (findWord(feature)[0]) {
+        document.write("Found single word.<br><br>");
+        searchTypes[i] = ["Word", findWord(feature)[1]];
+      }
+      else {
+        document.write("No search term found.<br><br>");
+        searchTypes[i] = ["NotFound"];
+      }
+     if (findTraitFound(searchTypes)) {
+       var foundPeople = filterResults(people, searchTypes);
+     }
+     var alertString = "";
+     for (i in foundPeople) {
+       alertString += foundPeople[i]["firstName"] + " " + foundPeople[i]["lastName"] + "\n";
+     }
+     alert(alertString);
+   }
 }
 
 function findChildren(foundPeople, people) {
@@ -81,6 +239,15 @@ function findGrandchilden(person, people) {
     }
   }
   return grandchildren;
+}
+
+function findGrandParents(person, people) {
+  grandParents = [];
+  parents = person["parents"];
+  for (i in parents) {
+    grandParents.push(findPersonFromID(parents[i]));
+  }
+  return grandParents;
 }
 
 function findAllChildren(foundPeople, people) {
@@ -128,9 +295,58 @@ function findSiblings(foundPerson, people) {
   return siblings;
 }
 
+function findNiecesAndNephews(person, people) {
+  //Find parents, find sibling of each parent, find children of each sibling, push children.
+  var parents = person["parents"];
+  var parentsSiblings = [];
+  var niecesAndNephews = [];
+  for (i in parents) {
+    foundChildren = findChildren(findPersonFromID(parents[i]));
+    for (j in foundChildren) {
+      parentsSiblings.push(foundChildren[i]);
+    }
+  }
+  for (i in parentsSiblings) {
+    niecesAndNephews.push(findPersonFromName(parentsSiblings[i]))
+  }
+  return niecesAndNephews;
+}
+
+function findGreatGrandParents(person, people) {
+  var greatGrandParents = [];
+  var parents = person["parents"];
+  for (i in parents) {
+    var foundParents = findPersonFromID(parents[i])["parents"];
+    for (j in foundParents) {
+      greatGrandParents.push(findNameFromId(foundParents[j]));
+    }
+  }
+  return greatGrandParents;
+}
+
+function findGreatGrandChildren(person, people) {
+  grandChildren = findGrandchilden(person);
+  var greatGrandChildren = [];
+  for (i in grandChildren) {
+    grandChildX = grandChildren[i];
+    for (j in findChildren(grandChildX)) {
+      greatGrandChildren.push(grandChildX[j])
+    }
+  }
+  return greatGrandChildren;
+}
+
 function findPersonFromID(people, id) {
   var foundPerson = (people.filter(function(person){
     return id == person["id"];
+  }));
+  return foundPerson[0];
+}
+
+function findPersonFromName(people, name) {
+  var names = name.split(" ");
+  var foundPerson = (people.filter(function(person){
+    return names[0] == person["firstName"] && names[1] == person["lastName"];
   }));
   return foundPerson[0];
 }
@@ -166,6 +382,20 @@ function findFamily(people, name) {
   alert(alertString);
 
 }
+
+function findAuntsAndUncles(person, people) {
+  var parents = person["parents"];
+  var parentsSiblings = [];
+  var niecesAndNephews = [];
+  for (i in parents) {
+    foundChildren = findChildren(findPersonFromID(parents[i]));
+    for (j in foundChildren) {
+      parentsSiblings.push(foundChildren[i]);
+    }
+  }
+  return parentsSiblings;
+}
+
 function findOldestSpouse(people, person) {
   return findNameFromId(people, person["currentSpouse"]);
 }
@@ -185,6 +415,16 @@ function findOldestParent(people, parents) {
   for (i in parents) {
     if (age(findPersonFromID(parents[i])) > age(findPersonFromID(eldest))) {
       eldest = parents[i];
+    }
+  }
+  return findNameFromId(eldest);
+}
+
+function findOldestGrandParent(people, grandParents) {
+  var eldest = grandParents[0];
+  for (i in grandParents) {
+    if (age(findPersonFromID(grandParents[i])) > age(findPersonFromID(eldest))) {
+      eldest = grandParents[i];
     }
   }
   return findNameFromId(eldest);
@@ -212,6 +452,39 @@ function findOldestGrandchild(people, person) {
   return eldest;
 }
 
+function findOldestAuntOrUncle(people, person) {
+  var auntsAndUncles = findAuntsAndUncles(person);
+  var eldest = auntsAndUncles[0];
+  for (i in auntsAndUncles) {
+    if (age(auntsAndUncles[i]) > age(eldest)) {
+      eldest = auntsAndUncles[i];
+    }
+  }
+  return eldest;
+}
+
+function findOldestGreatGrandchild(people, person) {
+  greatGrandChildren = findGreatGrandChildren(person, people);
+  var eldest = greatGrandChildren[0];
+  for (i in greatGrandChildren) {
+    if (age(greatGrandChildren[i]) > age(eldest)) {
+      eldest = greatGrandChildren[i];
+    }
+  }
+  return eldest;
+}
+
+function findOldestGreatGrandParent(people, person) {
+  greatGrandParents = findGreatGrandParents(person, people);
+  var eldest = greatGrandParents[0];
+  for (i in greatGrandParents) {
+    if (age(greatGrandParents[i]) > age(eldest)) {
+      eldest = greatGrandParents[i];
+    }
+  }
+  return eldest;
+}
+
 function findNextOfKin(people, name) {
   var foundPeople = findNames(people, name);
   var person = foundPeople[0];
@@ -231,12 +504,29 @@ function findNextOfKin(people, name) {
   else if (findGrandchilden(person, people) != []) {
     alertString = findOldestGrandchild(people, person);
   }
-
+  else if (findGrandParents(person, people) != []) {
+    alertString = findOldestGrandParent(people, person);
   }
+  else if (findNiecesAndNephews(person, people) != []) {
+    alertString = findOldestNieceOrNephew(people, person);
+  }
+  else if (findAuntsAndUncles(person, people) != []) {
+    alertString = findOldestAuntOrUncle(people, person);
+  }
+  else if (findGreatGrandChildren(person, people) != []) {
+    alertString = findOldestGreatGrandchild(people, person);
+  }
+  else if (findGreatGrandParents(person, people) != []) {
+    alertString = findOldestGreatGrandParent(people, person);
+  }
+  else {
+    alertString = "No next of kin found.";
+  }
+
 
   alert(alertString);
 }
-function findFeatures(people, nameFeatures) {
+function findFeatures(people, features) {
 
 }
 function displayResults(){
