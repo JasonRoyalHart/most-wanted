@@ -144,8 +144,9 @@ function findTraitFound(searchTypes) {
 
 function filterResults(people, searchTypes) {
   for (i in searchTypes) {
-    searchType = searchTypes[i];
-    type = searchType[0];
+    var searchType = searchTypes[i];
+    var type = searchType[0];
+    var foundPeople = [];
     if (type == "Age") {
       foundPeople = (people.filter(function(person){
         return searchType[1] == person.age;
@@ -208,12 +209,17 @@ function initSearchByTraits(people, features){
      if (findTraitFound(searchTypes)) {
        var foundPeople = filterResults(people, searchTypes);
      }
-     var alertString = "";
+   }
+   var alertString = "";
+   if (foundPeople == []) {
+     alertString = "No names found.";
+   }
+   else {
      for (i in foundPeople) {
        alertString += foundPeople[i]["firstName"] + " " + foundPeople[i]["lastName"] + "\n";
      }
-     alert(alertString);
    }
+   alert(alertString);
 }
 
 function findChildren(foundPeople, people) {
