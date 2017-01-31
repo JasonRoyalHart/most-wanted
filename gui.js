@@ -28,7 +28,7 @@ function initSearch(people, choice){
 function findNames(people, name) {
   var splitNames = name.split(" ");
   if (splitNames.length != 2) {
-    name = prompt("Please enter a first and last name.")
+    name = prompt("Please enter a first and last name.");
     findNames(people, name);
   }
   foundPeople = (people.filter(function(person){
@@ -179,9 +179,9 @@ function filterResults(people, searchTypes) {
 function initSearchByTraits(people, features){
     var featuresArray = features.replace(/\s/g,'').split(",");
     var searchTypes = [];
-    document.write(featuresArray);
+//    document.write(featuresArray);
     for (i in featuresArray) {
-      feature = featuresArray[i];
+      var feature = featuresArray[i];
       if (Number(feature != NaN) && feature>-1 && feature<10000) {
         document.write("Found a 1 to 4 digit number. (Age)<br><br>");
         searchTypes[i] = ["Age", feature];
@@ -251,7 +251,7 @@ function findGrandParents(person, people) {
   grandParents = [];
   parents = person["parents"];
   for (i in parents) {
-    grandParents.push(findPersonFromID(parents[i]));
+    grandParents.push(findPersonFromId(people, parents[i]));
   }
   return grandParents;
 }
@@ -342,7 +342,7 @@ function findGreatGrandChildren(person, people) {
   return greatGrandChildren;
 }
 
-function findPersonFromID(people, id) {
+function findPersonFromId(people, id) {
   var foundPerson = (people.filter(function(person){
     return id == person["id"];
   }));
@@ -393,9 +393,9 @@ function findAuntsAndUncles(person, people) {
   var parents = person["parents"];
   var parentsSiblings = [];
   var niecesAndNephews = [];
-  for (i in parents) {
-    foundChildren = findChildren(findPersonFromID(parents[i]));
-    for (j in foundChildren) {
+  for (var i in parents) {
+    var foundChildren = findChildren(people, [findPersonFromId(people, parents[i])]);
+    for (var j in foundChildren) {
       parentsSiblings.push(foundChildren[i]);
     }
   }
@@ -419,7 +419,7 @@ function findOldestChild(people, children) {
 function findOldestParent(people, parents) {
   var eldest = parents[0];
   for (i in parents) {
-    if (age(findPersonFromID(parents[i])) > age(findPersonFromID(eldest))) {
+    if (getAge(findPersonFromID(parents[i])) > age(findPersonFromID(eldest))) {
       eldest = parents[i];
     }
   }
@@ -429,7 +429,7 @@ function findOldestParent(people, parents) {
 function findOldestGrandParent(people, grandParents) {
   var eldest = grandParents[0];
   for (i in grandParents) {
-    if (age(findPersonFromID(grandParents[i])) > age(findPersonFromID(eldest))) {
+    if (getAge(findPersonFromID(grandParents[i])) > age(findPersonFromID(eldest))) {
       eldest = grandParents[i];
     }
   }
@@ -440,7 +440,7 @@ function findOldestSibling(people, person) {
   var siblings = findSiblings(person, people);
   var eldest = siblings[0];
   for (i in siblings) {
-    if (age(siblings[i]) > age(eldest)) {
+    if (getAge(siblings[i]) > age(eldest)) {
       eldest = siblings[i];
     }
   }
@@ -451,7 +451,7 @@ function findOldestGrandchild(people, person) {
   var grandchildren = findGrandchilden(person);
   var eldest = grandchildren[0];
   for (i in grandchildren) {
-    if (age(grandchildren[i]) > age(eldest)) {
+    if (getAge(grandchildren[i]) > age(eldest)) {
       eldest = grandchildren[i];
     }
   }
@@ -462,7 +462,7 @@ function findOldestAuntOrUncle(people, person) {
   var auntsAndUncles = findAuntsAndUncles(person);
   var eldest = auntsAndUncles[0];
   for (i in auntsAndUncles) {
-    if (age(auntsAndUncles[i]) > age(eldest)) {
+    if (getAge(auntsAndUncles[i]) > age(eldest)) {
       eldest = auntsAndUncles[i];
     }
   }
@@ -473,7 +473,7 @@ function findOldestGreatGrandchild(people, person) {
   greatGrandChildren = findGreatGrandChildren(person, people);
   var eldest = greatGrandChildren[0];
   for (i in greatGrandChildren) {
-    if (age(greatGrandChildren[i]) > age(eldest)) {
+    if (getAge(greatGrandChildren[i]) > age(eldest)) {
       eldest = greatGrandChildren[i];
     }
   }
@@ -484,7 +484,7 @@ function findOldestGreatGrandParent(people, person) {
   greatGrandParents = findGreatGrandParents(person, people);
   var eldest = greatGrandParents[0];
   for (i in greatGrandParents) {
-    if (age(greatGrandParents[i]) > age(eldest)) {
+    if (getAge(greatGrandParents[i]) > age(eldest)) {
       eldest = greatGrandParents[i];
     }
   }
@@ -543,14 +543,15 @@ function isNumeric() {
 }
 function findDobFromName(people, name) {
   var names = name.split(" ");
-  entry = (people.filter(function(person){
+  var entry = (people.filter(function(person){
     return person["firstName"] == names[0] && person["lastName"] == names[1];
   }));
   return entry[0]["dob"];
 }
 
-function getAge(people, person){
-    var dob = findDobFromName(people, person);
+function getAge(people, person) {
+    var name = person["firstName"] + " " + person["lastName"];
+    var dob = findDobFromName(people, name);
     var todaysDate = new Date();
     for (i = 0; i < dob.length; i++) {
       if (dob[i] == "/") {
