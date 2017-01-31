@@ -5,6 +5,42 @@ describe('function findNameFromId', function() {
   });
 });
 
+
+
+describe('function findHeight', function() {
+  it('Find Height from string given', function() {
+    expect(findHeight("6'4\"")).toEqual([true, 76]);
+  });
+});
+
+
+describe('function findAgeRange', function() {
+  it('Find Age Range from string given', function() {
+    expect(findAgeRange("18-35")).toEqual([true, "18", "35"]);
+  });
+});
+
+
+describe('function findNames', function() {
+  it('Return people found based on a name sent', function() {
+    expect(findNames(data, "Billy Bob")).toEqual(	[{
+    		"id": 272822514,
+    		"firstName": "Billy",
+    		"lastName": "Bob",
+    		"gender": "male",
+    		"dob": "1/18/1949",
+    		"height": 71,
+    		"weight": 175,
+    		"eyeColor": "brown",
+    		"occupation": "programmer",
+    		"parents": [],
+    		"currentSpouse": 401222887
+    	}]);
+  });
+});
+
+
+
 describe('function findPersonFromName', function() {
   it('Find Billy Bob from name', function() {
     expect(findPersonFromName(data, "Billy Bob")).toEqual(	{
@@ -161,6 +197,178 @@ describe('function findOldestChild', function() {
         	});
   });
 });
+
+describe('function findOldestParent', function() {
+  it('Find oldest parent out of the list given.', function() {
+    expect(findOldestParent(data, [	{
+    		"id": 272822514,
+    		"firstName": "Billy",
+    		"lastName": "Bob",
+    		"gender": "male",
+    		"dob": "1/18/1949",
+    		"height": 71,
+    		"weight": 175,
+    		"eyeColor": "brown",
+    		"occupation": "programmer",
+    		"parents": [],
+    		"currentSpouse": 401222887
+    	},	{
+      		"id": 401222887,
+      		"firstName": "Uma",
+      		"lastName": "Bob",
+      		"gender": "female",
+      		"dob": "4/1/1947",
+      		"height": 65,
+      		"weight": 162,
+      		"eyeColor": "brown",
+      		"occupation": "assistant",
+      		"parents": [],
+      		"currentSpouse": 272822514
+      	},{
+      		"id": 409574486,
+      		"firstName": "Michael",
+      		"lastName": "Walkens",
+      		"gender": "male",
+      		"dob": "5/9/1951",
+      		"height": 76,
+      		"weight": 250,
+      		"eyeColor": "brown",
+      		"occupation": "landscaper",
+      		"parents": [],
+      		"currentSpouse": 260451248
+      	}])).toEqual("Uma Bob");
+  });
+});
+
+describe('function findOldestGrandchild', function() {
+  it('Find oldest grand child out of the list given.', function() {
+    expect(findOldestGrandchild(data, [	{
+    		"id": 272822514,
+    		"firstName": "Billy",
+    		"lastName": "Bob",
+    		"gender": "male",
+    		"dob": "1/18/1949",
+    		"height": 71,
+    		"weight": 175,
+    		"eyeColor": "brown",
+    		"occupation": "programmer",
+    		"parents": [],
+    		"currentSpouse": 401222887
+    	},	{
+      		"id": 401222887,
+      		"firstName": "Uma",
+      		"lastName": "Bob",
+      		"gender": "female",
+      		"dob": "4/1/1947",
+      		"height": 65,
+      		"weight": 162,
+      		"eyeColor": "brown",
+      		"occupation": "assistant",
+      		"parents": [],
+      		"currentSpouse": 272822514
+      	},{
+      		"id": 409574486,
+      		"firstName": "Michael",
+      		"lastName": "Walkens",
+      		"gender": "male",
+      		"dob": "5/9/1951",
+      		"height": 76,
+      		"weight": 250,
+      		"eyeColor": "brown",
+      		"occupation": "landscaper",
+      		"parents": [],
+      		"currentSpouse": 260451248
+      	}])).toEqual("Uma Bob");
+  });
+});
+
+
+describe('function findOldestGrandParent', function() {
+  it('Find oldest parent out of the list given.', function() {
+    expect(findOldestGrandParent(data, [	{
+    		"id": 272822514,
+    		"firstName": "Billy",
+    		"lastName": "Bob",
+    		"gender": "male",
+    		"dob": "1/18/1949",
+    		"height": 71,
+    		"weight": 175,
+    		"eyeColor": "brown",
+    		"occupation": "programmer",
+    		"parents": [],
+    		"currentSpouse": 401222887
+    	},	{
+      		"id": 401222887,
+      		"firstName": "Uma",
+      		"lastName": "Bob",
+      		"gender": "female",
+      		"dob": "4/1/1947",
+      		"height": 65,
+      		"weight": 162,
+      		"eyeColor": "brown",
+      		"occupation": "assistant",
+      		"parents": [],
+      		"currentSpouse": 272822514
+      	},{
+      		"id": 409574486,
+      		"firstName": "Michael",
+      		"lastName": "Walkens",
+      		"gender": "male",
+      		"dob": "5/9/1951",
+      		"height": 76,
+      		"weight": 250,
+      		"eyeColor": "brown",
+      		"occupation": "landscaper",
+      		"parents": [],
+      		"currentSpouse": 260451248
+      	}])).toEqual("Uma Bob");
+  });
+});
+
+describe('function findOldestSibling', function() {
+  it('Find oldest sibling out of the list given.', function() {
+    expect(findOldestSibling(data, [	{
+    		"id": 272822514,
+    		"firstName": "Billy",
+    		"lastName": "Bob",
+    		"gender": "male",
+    		"dob": "1/18/1949",
+    		"height": 71,
+    		"weight": 175,
+    		"eyeColor": "brown",
+    		"occupation": "programmer",
+    		"parents": [],
+    		"currentSpouse": 401222887
+    	},	{
+      		"id": 401222887,
+      		"firstName": "Uma",
+      		"lastName": "Bob",
+      		"gender": "female",
+      		"dob": "4/1/1947",
+      		"height": 65,
+      		"weight": 162,
+      		"eyeColor": "brown",
+      		"occupation": "assistant",
+      		"parents": [],
+      		"currentSpouse": 272822514
+      	},{
+      		"id": 409574486,
+      		"firstName": "Michael",
+      		"lastName": "Walkens",
+      		"gender": "male",
+      		"dob": "5/9/1951",
+      		"height": 76,
+      		"weight": 250,
+      		"eyeColor": "brown",
+      		"occupation": "landscaper",
+      		"parents": [],
+      		"currentSpouse": 260451248
+      	}])).toEqual("Uma Bob");
+  });
+});
+
+
+
 
 describe('function findChildren', function() {
   it('Find Michael Walkens children', function() {

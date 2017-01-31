@@ -72,22 +72,23 @@ function findHeight(feature) {
       return [false, 0];
     }
       //find first Number
-    if (Number(feature.slice(0, singleQuote-1)) != NaN) {
-      var feet = Number(feature.slice(0, singleQuote-1));
+    if (Number(feature.slice(0, singleQuote)) != NaN) {
+      var feet = Number(feature.slice(0, singleQuote));
     }
     else {
       return [false, 0];
     }
-    if (Number(feature.slice(singleQuote+1, feature.slice(doubleQuote-1))) != NaN) {
-      var inches = Number(feature.slice(singleQuote+1, feature.slice(doubleQuote-1)));
+    if (Number(feature.slice(singleQuote+1, doubleQuote)) != NaN) {
+      var inches = Number(feature.slice(singleQuote+1, doubleQuote));
     }
     else {
       return [false, 0];
     }
-    return [true, (feet*12)+inches];
+    var height = (feet*12) + inches;
+    return [true, height];
   }
   else {
-    return false;
+    return [false,0];
   }
 }
 
@@ -101,13 +102,13 @@ function findAgeRange(feature) {
       break;
     }
   }
-  if (feature.slice(0, dash-1) == NaN) {
+  if (feature.slice(0, dash) == NaN) {
     return [false, 0, 0];
   }
   else {
-    var lowAge = feature.slice(0, dash-1);
+    var lowAge = feature.slice(0, dash);
   }
-  if (feature.slice(dash+1, feature.length) == NaN) {
+  if (feature.slice(dash+1, feature.length-1) == NaN) {
     return [false, 0, 0];
   }
   else {
@@ -419,43 +420,41 @@ function findOldestChild(people, children) {
 function findOldestParent(people, parents) {
   var eldest = parents[0];
   for (i in parents) {
-    if (getAge(findPersonFromID(parents[i])) > age(findPersonFromID(eldest))) {
+    if (getAge(people, parents[i]) > getAge(people, eldest)) {
       eldest = parents[i];
     }
   }
-  return findNameFromId(eldest);
+  return eldest["firstName"] + " " + eldest["lastName"];
 }
 
 function findOldestGrandParent(people, grandParents) {
   var eldest = grandParents[0];
   for (i in grandParents) {
-    if (getAge(findPersonFromID(grandParents[i])) > age(findPersonFromID(eldest))) {
+    if (getAge(people, grandParents[i]) > getAge(people, eldest)) {
       eldest = grandParents[i];
     }
   }
-  return findNameFromId(eldest);
+  return eldest["firstName"] + " " + eldest["lastName"];
 }
 
-function findOldestSibling(people, person) {
-  var siblings = findSiblings(person, people);
+function findOldestSibling(people, siblings) {
   var eldest = siblings[0];
   for (i in siblings) {
-    if (getAge(siblings[i]) > age(eldest)) {
+    if (getAge(people, siblings[i]) > getAge(people, eldest)) {
       eldest = siblings[i];
     }
   }
-  return eldest;
+  return eldest["firstName"] + " " + eldest["lastName"];
 }
 
-function findOldestGrandchild(people, person) {
-  var grandchildren = findGrandchilden(person);
-  var eldest = grandchildren[0];
-  for (i in grandchildren) {
-    if (getAge(grandchildren[i]) > age(eldest)) {
-      eldest = grandchildren[i];
+function findOldestGrandchild(people, grandChildren) {
+  var eldest = grandChildren[0];
+  for (i in grandChildren) {
+    if (getAge(people, grandChildren[i]) > getAge(people, eldest)) {
+      eldest = grandChildren[i];
     }
   }
-  return eldest;
+  return eldest["firstName"] + " " + eldest["lastName"];
 }
 
 function findOldestAuntOrUncle(people, person) {
